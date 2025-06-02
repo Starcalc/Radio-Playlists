@@ -1,4 +1,4 @@
-import ctypes
+import os
 import json
 import logging.config
 import os
@@ -12,6 +12,9 @@ import pandas as pd
 import requests
 from requests import Response
 from tqdm.auto import tqdm
+
+if os.name == 'nt':
+    import ctypes
 
 class PlaylistExtractor:
     logging_config_loaded = False
@@ -79,7 +82,8 @@ class PlaylistExtractor:
                 time.sleep(self.sleep_secs)
                 return req
 
-        ctypes.windll.kernel32.SetThreadExecutionState(0x80000001)
+        if os.name == 'nt':
+            ctypes.windll.kernel32.SetThreadExecutionState(0x80000001)
 
         log_extra = {'station': station}
 
@@ -139,7 +143,8 @@ class PlaylistExtractor:
             progress_bar.set_postfix_str(status_msg)
             self.logger.info(status_msg, extra=log_extra)
 
-        ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
+        if os.name == 'nt':
+            ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
 
         if not pages:
             return pd.DataFrame()
@@ -169,7 +174,7 @@ class PlaylistExtractor:
                     start = max(start, df.iloc[-1].name)
 
                 start = start.floor('1d')
-                end = pd.Timestamp.now().ceil('1d')
+                end = pd.Timestamp.now().floor('1d')
 
                 if start > end:
                     raise ValueError(f'{station}: End time is later than start time')
