@@ -8,7 +8,11 @@ class SwrExtractor(PlaylistExtractor):
     def __init__(self, log=True, sleep_secs=1):
         super().__init__(log, sleep_secs)
         self.broadcaster = 'swr'
-        self.oldest_timestamp = pd.Timedelta(days=90)
+        if station == 'swr1':
+            self.oldest_timestamp = pd.Timedelta(days=30)
+        else:
+            self.oldest_timestamp = pd.Timedelta(days=90)
+
         self.stations = {'swr1': 'https://www.swr.de/swr1/bw/playlist/index.html',
                          'swr3': 'https://www.swr3.de/playlisten/index.html',
                          'swr4': 'https://www.swr.de/swr4/musik/musikrecherche-s-bw-102.html',
